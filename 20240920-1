@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フリップカードで単語学習</title>
+  <style>
+    /* カードのスタイル */
+    .card {
+      perspective: 1000px;
+      width: 300px;
+      height: 200px;
+      margin: 50px auto;
+      cursor: pointer;
+    }
+    /* カードの内側 */
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    /* カードがフリップしたときのスタイル */
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    /* カードの前面と背面 */
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      border-radius: 10px;
+    }
+    /* 前面のスタイル（ドイツ語の単語） */
+    .card-front {
+      background-color: #3498db;
+    }
+    /* 背面のスタイル（英語の単語） */
+    .card-back {
+      background-color: #2ecc71;
+      transform: rotateY(180deg);
+    }
+
+    /* ボタンの配置 */
+    .nav-button {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #previous-btn {
+      left: 0;
+    }
+    #next-btn {
+      right: 0;
+    }
+    /* ボタンを非表示にするスタイル */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">ドイツ語暗記カード</h2>
+
+<div class="card" onclick="flipCard()">
+  <div class="card-inner">
+    <div class="card-front" id="german-word">
+      ドイツ語単語
+    </div>
+    <div class="card-back" id="english-word">
+      英語単語
+    </div>
+  </div>
+</div>
+
+<button id="previous-btn" class="nav-button hidden" onclick="previousWord()">Previous Word</button>
+<button id="next-btn" class="nav-button" onclick="nextWord()">Next Word</button>
+
+<script>
+  // 単語リスト（ドイツ語 - 日本語）
+  const wordList = [
+    { german: 'der Hund', english: '犬' },
+    { german: 'die Katze', english: '猫' },
+    { german: 'der Apfel', english: 'リンゴ' },
+    { german: 'das Haus', english: '家' },
+    { german: 'abfahren', english: '出発する' },
+    { german: 'abholen', english: '迎えに行く' },
+    { german: 'ändern', english: '変える、変わる' },
+    { german: 'anfangen', english: '始める、始まる' },
+    { german: 'ankommen', english: '到着する' },
+    { german: 'anmachen', english: '電気をつける' },
+    { german: 'anmelden', english: '申し込む' },
+    { german: 'annehmen', english: '仮定する' },
+    { german: 'anrufen', english: '電話する' },
+    { german: 'anziehn', english: '服などを着る' },
+    { german: 'arbeiten', english: '働く' },
+    { german: 'atmen', english: '呼吸する' },
+    { german: 'aufgehen', english: '太陽などが昇る' },
+    { german: 'aufmachen', english: '開ける' },
+    { german: 'aufräumen', english: '片づける' },
+    { german: 'aufstehen', english: '起床する' },
+    { german: 'ausfallen', english: '催し物などが中止になる' },
+    { german: 'ausgeben', english: '支出する' },
+    { german: 'ausmachen', english: '電気を消す' },
+    { german: 'aussehen', english: '～のように見える' },
+    { german: 'aussteigen', english: '下車する' },
+    { german: 'ausziehen', english: '脱ぐ' },
+    { german: 'backen', english: 'パンなどを焼く' },
+    { german: 'baden', english: '入浴する' },
+    { german: 'bauen', english: '建てる' },
+    { german: 'bedeuten', english: '意味する' },
+    { german: 'beeilen', english: '急ぐ' },
+    { german: 'befehlen', english: '命令する' },
+    { german: 'begegnen', english: '偶然出会う' },
+    { german: 'beginnen', english: '始まる、始める' },
+    { german: 'begleiten', english: '同伴する' },
+    { german: 'begreifen', english: '理解する' },
+    { german: 'begrüen', english: '挨拶をする' },
+    { german: 'behaupten', english: '主張する' },
+    { german: 'bekommen', english: '受け取る' },
+    { german: 'benutzen', english: '利用する' },
+    { german: 'beobachten', english: '注意深く観察する' },
+    { german: 'beschließen', english: '決める' },
+    { german: 'besichtigen', english: '見物する' },
+    { german: 'besitzen', english: '所有している' },
+    { german: 'besorgen', english: '手に入れる' },
+    { german: 'bestehen', english: '試験に受かる' },
+    { german: 'bestellen', english: '注文する' },
+    { german: 'besuchen', english: '訪問する' },
+    { german: 'betracthen', english: '眺める、観察する' },
+    { german: 'bezahlen', english: '支払う' },
+    { german: 'bieten', english: '提供する' },
+    { german: 'bilden', english: '形作る' },
+    { german: 'bleiben', english: 'とどまる' },
+    { german: 'blicken', english: '目を向ける' },
+    { german: 'braten', english: '肉などを焼く' },
+    { german: 'brechen', english: '折る、折れる' },
+    { german: 'bringen', english: '持っていく' },
+    { german: 'dauern', english: '～の時間がかかる' },
+    { german: 'drochen', english: '脅す' },
+    { german: 'drücken', english: '押す' },
+    { german: 'durchführen', english: '実行する' },
+    { german: 'duschen', english: 'シャワーを浴びる' },
+    { german: 'duzen', english: 'duで呼び合う' },
+    // 他の単語を追加
+  ];
+
+  let currentIndex = 0;
+
+  // カードをフリップする関数
+  function flipCard() {
+    const card = document.querySelector('.card');
+    card.classList.toggle('flipped');
+  }
+
+
+  // ボタンの表示/非表示を制御する関数
+  function updateButtons() {
+    const previousBtn = document.getElementById('previous-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // 最初の単語ではPreviousボタンを非表示、最後の単語ではNextボタンを非表示
+    if (currentIndex === 0) {
+      previousBtn.classList.add('hidden');
+    } else {
+      previousBtn.classList.remove('hidden');
+    }
+
+    if (currentIndex === wordList.length - 1) {
+      nextBtn.classList.add('hidden');
+    } else {
+      nextBtn.classList.remove('hidden');
+    }
+  }
+
+  // 次の単語を表示する関数
+  function nextWord() {
+    if (currentIndex < wordList.length - 1) {
+      currentIndex++;
+      updateCard();
+    }
+  }
+
+  // 前の単語を表示する関数
+  function previousWord() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCard();
+    }
+  }
+
+  // 単語カードを更新する関数
+  function updateCard() {
+    // ドイツ語と英語の単語を更新
+    document.getElementById('german-word').innerHTML = wordList[currentIndex].german;
+    document.getElementById('english-word').innerHTML = wordList[currentIndex].english;
+
+    // フリップがされたままの場合、戻す
+    const card = document.querySelector('.card');
+    if (card.classList.contains('flipped')) {
+      card.classList.remove('flipped');
+    }
+
+    // ボタンの表示/非表示を更新
+    updateButtons();
+  }
+
+  // ページ読み込み時に最初の単語を表示
+  window.onload = function() {
+    updateCard();
+  }
+</script>
+
+</body>
+</html>
