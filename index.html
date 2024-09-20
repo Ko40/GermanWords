@@ -67,16 +67,19 @@
 <button onclick="nextWord()">次の単語</button>
 
 <script>
-  // 単語リスト（ドイツ語 - 英語）
-  const wordList = [
-    { german: 'Hund', english: 'dog' },
-    { german: 'Katze', english: 'cat' },
-    { german: 'Apfel', english: 'apple' },
-    { german: 'Haus', english: 'house' },
-    // 他の単語を追加
-  ];
-
+  let wordList = [];
   let currentIndex = 0;
+
+  // JSONファイルを読み込む関数
+  function loadWords() {
+    fetch('wordlist.json')
+      .then(response => response.json())
+      .then(data => {
+        wordList = data;
+        nextWord(); // 最初の単語を表示
+      })
+      .catch(error => console.error('エラーが発生しました:', error));
+  }
 
   // カードをフリップする関数
   function flipCard() {
@@ -86,6 +89,8 @@
 
   // 次の単語を表示する関数
   function nextWord() {
+    if (wordList.length === 0) return; // 単語リストが空の場合は何もしない
+
     // 現在の単語のインデックスを更新
     currentIndex = (currentIndex + 1) % wordList.length;
 
@@ -100,12 +105,9 @@
     }
   }
 
-  // ページ読み込み時に最初の単語を表示
-  window.onload = function() {
-    nextWord();
-  }
+  // ページ読み込み時に単語を読み込む
+  window.onload = loadWords;
 </script>
 
 </body>
 </html>
-
