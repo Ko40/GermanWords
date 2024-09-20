@@ -47,6 +47,26 @@
       background-color: #2ecc71;
       transform: rotateY(180deg);
     }
+
+    /* ボタンの配置 */
+    .nav-button {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #previous-btn {
+      left: 0;
+    }
+    #next-btn {
+      right: 0;
+    }
+    /* ボタンを非表示にするスタイル */
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -64,7 +84,8 @@
   </div>
 </div>
 
-<button onclick="nextWord()">Next Word</button>
+<button id="previous-btn" class="nav-button hidden" onclick="previousWord()">Previous Word</button>
+<button id="next-btn" class="nav-button" onclick="nextWord()">Next Word</button>
 
 <script>
   // 単語リスト（ドイツ語 - 日本語）
@@ -116,11 +137,44 @@
     card.classList.toggle('flipped');
   }
 
+
+  // ボタンの表示/非表示を制御する関数
+  function updateButtons() {
+    const previousBtn = document.getElementById('previous-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // 最初の単語ではPreviousボタンを非表示、最後の単語ではNextボタンを非表示
+    if (currentIndex === 0) {
+      previousBtn.classList.add('hidden');
+    } else {
+      previousBtn.classList.remove('hidden');
+    }
+
+    if (currentIndex === wordList.length - 1) {
+      nextBtn.classList.add('hidden');
+    } else {
+      nextBtn.classList.remove('hidden');
+    }
+  }
+
   // 次の単語を表示する関数
   function nextWord() {
-    // 現在の単語のインデックスを更新
-    currentIndex = (currentIndex + 1) % wordList.length;
+    if (currentIndex < wordList.length - 1) {
+      currentIndex++;
+      updateCard();
+    }
+  }
 
+  // 前の単語を表示する関数
+  function previousWord() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      updateCard();
+    }
+  }
+
+  // 単語カードを更新する関数
+  function updateCard() {
     // ドイツ語と英語の単語を更新
     document.getElementById('german-word').innerHTML = wordList[currentIndex].german;
     document.getElementById('english-word').innerHTML = wordList[currentIndex].english;
@@ -130,11 +184,14 @@
     if (card.classList.contains('flipped')) {
       card.classList.remove('flipped');
     }
+
+    // ボタンの表示/非表示を更新
+    updateButtons();
   }
 
   // ページ読み込み時に最初の単語を表示
   window.onload = function() {
-    nextWord();
+    updateCard();
   }
 </script>
 
