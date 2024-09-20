@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>フリップカードで単語学習</title>
+  <style>
+    /* カードのスタイル */
+    .card {
+      perspective: 1000px;
+      width: 300px;
+      height: 200px;
+      margin: 50px auto;
+      cursor: pointer;
+    }
+    /* カードの内側 */
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    /* カードがフリップしたときのスタイル */
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    /* カードの前面と背面 */
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      border-radius: 10px;
+    }
+    /* 前面のスタイル（ドイツ語の単語） */
+    .card-front {
+      background-color: #3498db;
+    }
+    /* 背面のスタイル（英語の単語） */
+    .card-back {
+      background-color: #2ecc71;
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">ドイツ語単語テスト (フリップカード形式)</h2>
+
+<div class="card" onclick="flipCard()">
+  <div class="card-inner">
+    <div class="card-front" id="german-word">
+      ドイツ語単語
+    </div>
+    <div class="card-back" id="english-word">
+      英語単語
+    </div>
+  </div>
+</div>
+
+<button onclick="nextWord()">次の単語</button>
+
+<script>
+  // 単語リスト（ドイツ語 - 英語）
+  const wordList = [
+    { german: 'Hund', english: 'dog' },
+    { german: 'Katze', english: 'cat' },
+    { german: 'Apfel', english: 'apple' },
+    { german: 'Haus', english: 'house' },
+    // 他の単語を追加
+  ];
+
+  let currentIndex = 0;
+
+  // カードをフリップする関数
+  function flipCard() {
+    const card = document.querySelector('.card');
+    card.classList.toggle('flipped');
+  }
+
+  // 次の単語を表示する関数
+  function nextWord() {
+    // 現在の単語のインデックスを更新
+    currentIndex = (currentIndex + 1) % wordList.length;
+
+    // ドイツ語と英語の単語を更新
+    document.getElementById('german-word').innerHTML = wordList[currentIndex].german;
+    document.getElementById('english-word').innerHTML = wordList[currentIndex].english;
+
+    // フリップがされたままの場合、戻す
+    const card = document.querySelector('.card');
+    if (card.classList.contains('flipped')) {
+      card.classList.remove('flipped');
+    }
+  }
+
+  // ページ読み込み時に最初の単語を表示
+  window.onload = function() {
+    nextWord();
+  }
+</script>
+
+</body>
+</html>
 
