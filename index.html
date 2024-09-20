@@ -67,6 +67,13 @@
     .hidden {
       display: none;
     }
+    /* 中央のボタンのスタイル */
+    #back-to-start-btn {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 30px;
+    }
   </style>
 </head>
 <body>
@@ -84,8 +91,8 @@
   </div>
 </div>
 
-<button id="previous-btn" class="nav-button hidden" onclick="previousWord()">Previous Word</button>
-<button onclick="backToStart()">Back to Start</button>
+<button id="previous-btn" class="nav-button hidden" onclick="prevWord()">Previous Word</button>
+<button id="back-to-start-btn" onclick="backToStart()">Back to Start</button>
 <button id="next-btn" class="nav-button" onclick="nextWord()">Next Word</button>
 
 <script>
@@ -199,9 +206,9 @@
       card.classList.remove('flipped');
     }
 
-    // ボタンの有効/無効を設定
-    document.getElementById('prevButton').style.display = (currentIndex === 0) ? 'none' : 'inline-block';
-    document.getElementById('nextButton').style.display = (currentIndex === wordList.length - 1) ? 'none' : 'inline-block';
+    // ボタンの表示を制御
+    document.getElementById('previous-btn').classList.toggle('hidden', currentIndex === 0);
+    document.getElementById('next-btn').classList.toggle('hidden', currentIndex === wordList.length - 1);
   }
 
   // ページ読み込み時に最初の単語を表示
