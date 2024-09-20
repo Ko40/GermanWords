@@ -85,6 +85,7 @@
 </div>
 
 <button id="previous-btn" class="nav-button hidden" onclick="previousWord()">Previous Word</button>
+<button onclick="backToStart()">Back to Start</button>
 <button id="next-btn" class="nav-button" onclick="nextWord()">Next Word</button>
 
 <script>
@@ -164,44 +165,30 @@
     card.classList.toggle('flipped');
   }
 
-
-  // ボタンの表示/非表示を制御する関数
-  function updateButtons() {
-    const previousBtn = document.getElementById('previous-btn');
-    const nextBtn = document.getElementById('next-btn');
-
-    // 最初の単語ではPreviousボタンを非表示、最後の単語ではNextボタンを非表示
-    if (currentIndex === 0) {
-      previousBtn.classList.add('hidden');
-    } else {
-      previousBtn.classList.remove('hidden');
-    }
-
-    if (currentIndex === wordList.length - 1) {
-      nextBtn.classList.add('hidden');
-    } else {
-      nextBtn.classList.remove('hidden');
-    }
-  }
-
   // 次の単語を表示する関数
   function nextWord() {
     if (currentIndex < wordList.length - 1) {
       currentIndex++;
-      updateCard();
     }
+    updateWord();
   }
 
   // 前の単語を表示する関数
-  function previousWord() {
+  function prevWord() {
     if (currentIndex > 0) {
       currentIndex--;
-      updateCard();
     }
+    updateWord();
   }
 
-  // 単語カードを更新する関数
-  function updateCard() {
+  // 最初の単語に戻る関数
+  function backToStart() {
+    currentIndex = 0;
+    updateWord();
+  }
+
+  // 単語を更新して、ボタンの表示を調整する関数
+  function updateWord() {
     // ドイツ語と英語の単語を更新
     document.getElementById('german-word').innerHTML = wordList[currentIndex].german;
     document.getElementById('english-word').innerHTML = wordList[currentIndex].english;
@@ -212,13 +199,14 @@
       card.classList.remove('flipped');
     }
 
-    // ボタンの表示/非表示を更新
-    updateButtons();
+    // ボタンの有効/無効を設定
+    document.getElementById('prevButton').style.display = (currentIndex === 0) ? 'none' : 'inline-block';
+    document.getElementById('nextButton').style.display = (currentIndex === wordList.length - 1) ? 'none' : 'inline-block';
   }
 
   // ページ読み込み時に最初の単語を表示
   window.onload = function() {
-    updateCard();
+    updateWord();
   }
 </script>
 
